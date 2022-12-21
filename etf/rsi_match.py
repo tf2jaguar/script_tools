@@ -2,11 +2,15 @@
 # -*- coding: utf-8 -*-
 import datetime
 import multiprocessing as mp
-
-import numpy as np
+import os
+import sys
 
 import efinance as ef
-from notify import send
+import numpy as np
+
+sys.path.append(os.path.dirname(__file__) + os.path.sep + '..')
+
+from util import notify
 
 
 class Rsi:
@@ -120,7 +124,7 @@ def find_match_etf(_below_rsi=31, _send_notify=True):
     if _send_notify:
         msg = ''.join([' '.join([str(etf_dict['code']), str(etf_dict['name']), str(etf_dict['cur_rsi']), '\n'])
                        for etf_dict in match_etf_list])
-        send(time_prefix[:-4] + ' etf统计', msg)
+        notify.send(time_prefix[:-4] + ' etf统计', msg)
     return match_etf_list
 
 
