@@ -549,6 +549,7 @@ def send(title: str, content: str) -> None:
     text = one() if hitokoto else ""
     content += "\n\n" + text
 
+    print('msg will sent to:', ", ".join(str(x.__name__) for x in notify_function))
     ts = [
         threading.Thread(target=mode, args=(title, content), name=mode.__name__)
         for mode in notify_function

@@ -2,31 +2,34 @@ name: 'Python Action'
 
 on:
   schedule:
-    - cron: '25 0,6 * * *'
+    - cron: '20 0,6 * * *'
 
 env:
   TZ: Asia/Shanghai
 
 jobs:
   jobs_1:
-    name: 'match etf rsi'
+    name: 'Match etf rsi'
     runs-on: ubuntu-latest
 
     steps:
     - uses: actions/checkout@v3
-    - name: Set up Python 3.x
-      uses: actions/setup-python@v3
+    - name: 'Set up Python 3.x'
+      uses: actions/setup-python@v4
       with:
         python-version: "3.x"
-    - name: Install dependencies
+        cache: 'pip'
+        cache-dependency-path: '**/requirements.txt'
+    - name: 'Install dependencies'
       run: |
-        python3 -m pip install --upgrade pip
-        pip3 install requests
+        echo 'run at:' `date '+%Y-%m-%d %H:%M:%S'`
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
-    - name: run etf
+    - name: 'Run script'
       env:
         DD_BOT_SECRET: ${{ secrets.DD_BOT_SECRET }}
         DD_BOT_TOKEN: ${{ secrets.DD_BOT_TOKEN }}
+        PUSH_PLUS_TOKEN: ${{ secrets.PUSH_PLUS_TOKEN }}
+        PUSH_PLUS_USER: ${{ secrets.PUSH_PLUS_USER }}
       run: |
         echo 'run at:' `date '+%Y-%m-%d %H:%M:%S'`
-        python3 etf/rsi_match.py
+        python etf/rsi_match.py
