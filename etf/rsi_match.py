@@ -151,7 +151,7 @@ def draw_etf_rsi_task_img():
 
 
 if __name__ == '__main__':
-    ETF_RSI_COST_TIME_LOG = 'etf_rsi_cost_time.txt'
-    ETF_RSI_COST_TIME_IMG = 'etf_rsi_cost_time.png'
+    ETF_RSI_COST_TIME_LOG = 'etf/etf_rsi_cost_time.txt'
+    ETF_RSI_COST_TIME_IMG = 'etf/etf_rsi_cost_time.png'
     find_match_etf()
     draw_etf_rsi_task_img()
