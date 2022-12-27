@@ -2,7 +2,7 @@ name: 'Python Action'
 
 on:
   schedule:
-    - cron: '20 0,6 * * *'
+    - cron: '20 23,6 * * *'
 
 env:
   TZ: Asia/Shanghai
@@ -26,6 +26,8 @@ jobs:
         if [ -f requirements.txt ]; then pip install -r requirements.txt; fi
     - name: 'Run script'
       env:
+        GITHUB_ACTOR: ${{ secrets.GH_ACTOR }}
+        GITHUB_TOKEN: ${{ secrets.GH_TOKEN }}
         DD_BOT_SECRET: ${{ secrets.DD_BOT_SECRET }}
         DD_BOT_TOKEN: ${{ secrets.DD_BOT_TOKEN }}
         PUSH_PLUS_TOKEN: ${{ secrets.PUSH_PLUS_TOKEN }}
@@ -33,3 +35,12 @@ jobs:
       run: |
         echo 'run at:' `date '+%Y-%m-%d %H:%M:%S'`
         python etf/rsi_match.py
+    - name: 'Commit and push if changed'
+      run: |
+        git diff
+        git config --global user.email "jelly_54@163.com"
+        git config --global user.name "zhangguodong"
+        git pull
+        git add -A
+        git commit -m "🎨Update statistics" || exit 0
+        git push

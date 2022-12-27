@@ -10,7 +10,7 @@ import numpy as np
 
 sys.path.append(os.path.dirname(__file__) + os.path.sep + '..')
 
-from util import notify
+from util import notify, draw_img
 
 
 class Rsi:
@@ -111,20 +111,25 @@ def multi_process_match_rsi(_funds_df, _rsi):
     end_t = datetime.datetime.now()
     elapsed_sec = (end_t - start_t).total_seconds()
     print("multi-process calculation cost: {}s".format("{:.2f}".format(elapsed_sec)))
-    return list(filter(None, results))
+    return list(filter(None, results)), elapsed_sec
 
 
-def find_match_etf(_below_rsi=31, _send_notify=True):
-    time_prefix = datetime.datetime.now().strftime('%Y%m%d%H%M')
+def find_match_etf(_below_rsi=31, _record_cost_time=True, _send_notify=True):
+    start_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
+
     all_funds = ef.fund.get_fund_codes('etf')
-    match_etf_list = multi_process_match_rsi(all_funds, _below_rsi)
+    match_etf_list, cost_time = multi_process_match_rsi(all_funds, _below_rsi)
     if not match_etf_list:
         match_etf_list.append({'code': 0, 'name': '暂无匹配结果', 'cur_rsi': 0})
+
+    if _record_cost_time:
+        with open(ETF_RSI_COST_TIME_LOG, 'a+') as f:
+            f.writelines(','.join([start_time_str, str(cost_time), '\n']))
 
     if _send_notify:
         msg = ''.join([' '.join([str(etf_dict['code']), str(etf_dict['name']), str(etf_dict['cur_rsi']), '\n'])
                        for etf_dict in match_etf_list])
-        notify.send(time_prefix[:-4] + ' etf统计', msg)
+        notify.send(start_time_str[:-6] + ' etf统计', msg)
     return match_etf_list
 
 
@@ -139,5 +144,14 @@ def previous_work_day(_cur_day, _previous):
     return cur_day
 
 
+def draw_etf_rsi_task_img():
+    record_lines = draw_img.get_record_data(ETF_RSI_COST_TIME_LOG)
+    draw_img.draw_img(record_lines, ETF_RSI_COST_TIME_IMG)
+    print('draw etf rsi task img done.')
+
+
 if __name__ == '__main__':
+    ETF_RSI_COST_TIME_LOG = 'etf_rsi_cost_time.txt'
+    ETF_RSI_COST_TIME_IMG = 'etf_rsi_cost_time.png'
     find_match_etf()
+    draw_etf_rsi_task_img()

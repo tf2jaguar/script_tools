@@ -1,3 +1,4 @@
-requests
-numpy
 efinance
+matplotlib
+numpy
+requests
