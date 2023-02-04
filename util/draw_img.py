@@ -43,7 +43,7 @@ def file_get_last_lines(file_path, num) -> []:
     return n_lines[-num:]
 
 
-def get_record_data(_path, _lines=60) -> []:
+def get_record_data(_path, _lines=50) -> []:
     lines = file_get_last_lines(_path, _lines)
     record_list = []
     for line in lines:
