@@ -6,6 +6,7 @@ from util import draw_img, draw_k_img, num, notify, update_file
 from where_my_money import common
 from where_my_money.fund import get_fund_codes
 from where_my_money.util.rsi import multi_process_match_rsi
+from where_my_money.util.workday import previous_work_day
 
 
 def find_match_etf(_start_time, _below_rsi=31, _record_cost_time=True):
@@ -28,21 +29,24 @@ def find_match_etf(_start_time, _below_rsi=31, _record_cost_time=True):
 
 
 def find_hs_k_data():
-    all_turnover = 0.0
     date_str = ''
-    h_df = common.get_quote_history_single(code='上证指数', beg='20220811', end='20230811')
+    all_turnover = 0.0
+    end_time = datetime.datetime.now().strftime('%Y%m%d')
+    beg_time = previous_work_day(end_time, 200).strftime('%Y%m%d')
+
+    h_df = common.get_quote_history_single(code='上证指数', beg=beg_time, end=end_time)
     if not h_df.empty:
         h_last_one = h_df.iloc[-1]
-        all_turnover = h_last_one['turnover']
         date_str = h_last_one['date']
-        draw_k_img.draw_k_img(_df=h_df, _save_path=IMG_PATH + h_last_one['code'] + '.png')
+        all_turnover = h_last_one['turnover']
+        draw_k_img.draw_k_img(_df=h_df, _save_path=IMG_PATH + h_last_one['code'] + '.png', _render_len=125)
 
-    s_df = common.get_quote_history_single(code='399001', beg='20220811', end='20230811')
+    s_df = common.get_quote_history_single(code='399001', beg=beg_time, end=end_time)
     if not s_df.empty:
         s_last_one = s_df.iloc[-1]
-        all_turnover = all_turnover + s_last_one['turnover']
         date_str = s_last_one['date']
-        draw_k_img.draw_k_img(_df=s_df, _save_path=IMG_PATH + s_last_one['code'] + '.png')
+        all_turnover = all_turnover + s_last_one['turnover']
+        draw_k_img.draw_k_img(_df=s_df, _save_path=IMG_PATH + s_last_one['code'] + '.png', _render_len=125)
 
     print('draw hs k line img done.')
     return [date_str, num.science_num(all_turnover, 2)]
