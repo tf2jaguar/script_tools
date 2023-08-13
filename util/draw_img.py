@@ -58,6 +58,7 @@ def draw_img(_list, _save_path) -> None:
     for d in _list:
         x.append(d[0])
         y.append(float(d[1]))
+    plt.cla()
     plt.xticks(rotation=90)
     plt.gca().yaxis.set_major_formatter(mticker.FormatStrFormatter('%.1f s'))
     plt.subplots_adjust(left=0.11, right=0.97, top=0.95, bottom=0.3)

@@ -34,7 +34,7 @@ jobs:
         PUSH_PLUS_USER: ${{ secrets.PUSH_PLUS_USER }}
       run: |
         echo 'run at:' `date '+%Y-%m-%d %H:%M:%S'`
-        python etf/rsi_match.py
+        python main.py
     - name: 'Commit and push if changed'
       run: |
         git diff

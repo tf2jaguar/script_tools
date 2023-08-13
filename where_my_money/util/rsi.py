@@ -2,15 +2,10 @@
 # -*- coding: utf-8 -*-
 import datetime
 import multiprocessing as mp
-import os
-import sys
 
-import efinance as ef
 import numpy as np
-
-sys.path.append(os.path.dirname(__file__) + os.path.sep + '..')
-
-from util import notify, draw_img
+from .workday import previous_work_day
+from ..common import get_quote_history_single
 
 
 class Rsi:
@@ -66,13 +61,13 @@ class Rsi:
         return t_rsi
 
 
-def stock_rsi(_code):
+def rsi_list(_code):
     _rsi = [0, 0]
 
     end_time = datetime.datetime.now().strftime('%Y%m%d')
     beg_time = previous_work_day(end_time, 600).strftime('%Y%m%d')
-    day_k_df = ef.stock.get_quote_history(stock_codes=_code, beg=beg_time, end=end_time)
-    # 收盘
+    day_k_df = get_quote_history_single(code=_code, beg=beg_time, end=end_time)
+
     day_close_k = day_k_df.iloc[:, 4]
     try:
         if len(day_close_k) < 2:
@@ -88,70 +83,27 @@ def stock_rsi(_code):
     return _rsi
 
 
-def below_rsi(etf_dict, max_rsi):
-    _rsi = stock_rsi(etf_dict['code'])
-    print(etf_dict['code'], etf_dict['name'], _rsi[-2:])
+def below_rsi(_dict, max_rsi):
+    _rsi = rsi_list(_dict['code'])
+    print(_dict['code'], _dict['name'], _rsi[-2:])
 
     if 0 < _rsi[-1] <= max_rsi:
-        etf_dict['cur_rsi'] = _rsi[-1]
-        return etf_dict
+        _dict['cur_rsi'] = _rsi[-1]
+        return _dict
     return None
 
 
-def multi_process_match_rsi(_funds_df, _rsi):
+def multi_process_match_rsi(_list_df, _rsi):
     start_t = datetime.datetime.now()
     _num_cores = int(mp.cpu_count())
-    print("use {} cpu calculate etf's rsi below {}".format(_num_cores, _rsi))
+    print("use {} cpu calculate codes rsi below {}".format(_num_cores, _rsi))
 
     pool = mp.Pool(_num_cores)
     results = [pool.apply_async(below_rsi, args=({'code': row.values[0], 'name': row.values[1]}, _rsi))
-               for index, row in _funds_df.iterrows()]
+               for index, row in _list_df.iterrows()]
     results = [p.get() for p in results]
 
     end_t = datetime.datetime.now()
     elapsed_sec = (end_t - start_t).total_seconds()
     print("multi-process calculation cost: {}s".format("{:.2f}".format(elapsed_sec)))
     return list(filter(None, results)), elapsed_sec
-
-
-def find_match_etf(_below_rsi=31, _record_cost_time=True, _send_notify=True):
-    start_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-
-    all_funds = ef.fund.get_fund_codes('etf')
-    match_etf_list, cost_time = multi_process_match_rsi(all_funds, _below_rsi)
-    if not match_etf_list:
-        match_etf_list.append({'code': 0, 'name': '暂无匹配结果', 'cur_rsi': 0})
-
-    if _record_cost_time:
-        with open(ETF_RSI_COST_TIME_LOG, 'a+') as f:
-            f.writelines(','.join([start_time_str, str(cost_time), '\n']))
-
-    if _send_notify:
-        msg = ''.join([' '.join([str(etf_dict['code']), str(etf_dict['name']), str(etf_dict['cur_rsi']), '\n'])
-                       for etf_dict in match_etf_list])
-        notify.send(start_time_str[:-6] + ' etf统计', msg)
-    return match_etf_list
-
-
-def previous_work_day(_cur_day, _previous):
-    cur_day = datetime.datetime.strptime(_cur_day, '%Y%m%d')
-    while _previous > 0:
-        cur_day += datetime.timedelta(days=-1)
-        # 一二 三四五 六七
-        # 0 1 2 3 4 5 6
-        if cur_day.weekday() < 5:
-            _previous -= 1
-    return cur_day
-
-
-def draw_etf_rsi_task_img():
-    record_lines = draw_img.get_record_data(ETF_RSI_COST_TIME_LOG)
-    draw_img.draw_img(record_lines, ETF_RSI_COST_TIME_IMG)
-    print('draw etf rsi task img done.')
-
-
-if __name__ == '__main__':
-    ETF_RSI_COST_TIME_LOG = 'etf/etf_rsi_cost_time.txt'
-    ETF_RSI_COST_TIME_IMG = 'etf/etf_rsi_cost_time.png'
-    find_match_etf()
-    draw_etf_rsi_task_img()

@@ -1,4 +1,6 @@
-efinance
+mplfinance
 matplotlib
 numpy
+pandas
 requests
+jsonpath
