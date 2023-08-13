@@ -24,6 +24,6 @@
 
 <div align="center">  
     <p>
-        <img src="https://raw.githubusercontent.com/tf2jaguar/script_tools/main/etf/etf_rsi_cost_time.png" width="400" alt="匹配etf执行耗时" />
+        <img src="https://raw.githubusercontent.com/tf2jaguar/script_tools/main/static/etf_rsi_cost_time.png" width="400" alt="匹配etf执行耗时" />
     </p>
 </div>

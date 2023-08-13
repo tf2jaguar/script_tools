@@ -4,6 +4,7 @@ from typing import List
 
 import pandas as pd
 from jsonpath import jsonpath
+from retry import retry
 
 from .config import EASTMONEY_KLINE_FIELDS, EASTMONEY_REQUEST_HEADERS
 from ..shared import session, rpc
@@ -11,6 +12,7 @@ from ..util import QUOTE_ID_MODE, get_quote_id, to_numeric
 
 
 @to_numeric
+@retry(tries=3, delay=1)
 def get_quote_history_single(code: str,
                              beg: str = '19000101',
                              end: str = '20500101',

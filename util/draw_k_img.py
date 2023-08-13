@@ -12,7 +12,8 @@ my_style = mpf.make_mpf_style(marketcolors=my_color, figcolor='(0.82, 0.83, 0.85
 
 class FontStyle:
     @staticmethod
-    def style(_name='Arial', _size='12', _color='black', _weight='bold', _va='bottom', _ha=None):
+    def style(_name='WenQuanYi Micro Hei', _size='12', _color='black', _weight='bold', _va='bottom', _ha=None):
+        # PingFang HK
         style = {'fontname': _name, 'size': _size, 'color': _color, 'weight': _weight, 'va': _va}
         if _ha:
             style['ha'] = _ha
@@ -20,11 +21,11 @@ class FontStyle:
 
     @staticmethod
     def normal_left():
-        return FontStyle.style(_name='pingfang HK', _weight='normal', _ha='left')
+        return FontStyle.style(_weight='normal', _ha='left')
 
     @staticmethod
     def normal_right():
-        return FontStyle.style(_name='pingfang HK', _weight='normal', _ha='right')
+        return FontStyle.style(_weight='normal', _ha='right')
 
 
 def text_val(one_data, key, _science=False, _round=False, div=1, r=2):
@@ -52,7 +53,7 @@ class InterCandle:
         self.ax2 = fig.add_axes([0.08, 0.15, 0.88, 0.10], sharex=self.ax1)
         self.ax2.set_ylabel('volume')
 
-        self.t1 = fig.text(0.50, 0.94, ' - ', FontStyle.style(_name='pingfang HK', _size='16', _ha='center'))
+        self.t1 = fig.text(0.50, 0.94, ' - ', FontStyle.style(_size='16', _ha='center'))
         self.t2 = fig.text(0.12, 0.90, '开/收: ', FontStyle.normal_right())
         self.t3 = fig.text(0.14, 0.89, f'', FontStyle.style(_size='24', _color='red'))
         self.t4 = fig.text(0.14, 0.86, f'', FontStyle.style(_color='red'))

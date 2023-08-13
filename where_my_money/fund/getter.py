@@ -4,11 +4,13 @@ import re
 
 import pandas as pd
 import requests
+from retry import retry
 
 from .config import FUND_REQUEST_HEADERS
 from ..config import rpc
 
 
+@retry(tries=3, delay=1)
 def get_fund_codes(ft: str = None) -> pd.DataFrame:
     params = [
         ('op', 'dy'),
