@@ -53,11 +53,17 @@ def find_hs_k_data():
 
 
 def merge_and_notify(_start_time, _hs_turnover, _matched_etf):
-    turnover_msg = ''.join([_hs_turnover[0], ' 沪深成交额: ', _hs_turnover[1]])
-    etf_msg = ''.join([' '.join([str(etf_dict['code']), str(etf_dict['name']), str(etf_dict['cur_rsi']), '\n'])
-                       for etf_dict in _matched_etf])
+    turnover_msg = ''
+    etf_msg = ''
 
-    update_file.update_hs_turnover("README.md", turnover_msg)
+    if not _hs_turnover:
+        turnover_msg = ''.join([_hs_turnover[0], ' 沪深成交额: ', _hs_turnover[1]])
+        update_file.update_hs_turnover("README.md", turnover_msg)
+
+    if not _matched_etf:
+        etf_msg = ''.join([' '.join([str(etf_dict['code']), str(etf_dict['name']), str(etf_dict['cur_rsi']), '\n'])
+                           for etf_dict in _matched_etf])
+
     notify.send(' '.join([_start_time[:-6], 'etf统计']), ''.join([turnover_msg, '\n\n', etf_msg]))
 
 
@@ -65,6 +71,14 @@ IMG_PATH = 'static/'
 
 if __name__ == '__main__':
     start_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
-    hs_turnover = find_hs_k_data()
-    matched_etf = find_match_etf(start_time_str)
+    try:
+        hs_turnover = find_hs_k_data()
+    except Exception as e:
+        print('find_hs_k_data has error!', e)
+
+    try:
+        matched_etf = find_match_etf(start_time_str)
+    except Exception as e:
+        print('find_match_etf has error!', e)
+
     merge_and_notify(start_time_str, hs_turnover, matched_etf)

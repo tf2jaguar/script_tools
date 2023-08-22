@@ -19,7 +19,7 @@ F = TypeVar('F')
 
 
 def to_numeric(func: F) -> F:
-    ignore = ['code']
+    ignore = ['code', 'name', 'date']
 
     @wraps(func)
     def run(*args, **kwargs):
