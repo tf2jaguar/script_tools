@@ -56,11 +56,11 @@ def merge_and_notify(_start_time, _hs_turnover, _matched_etf):
     turnover_msg = ''
     etf_msg = ''
 
-    if not _hs_turnover:
+    if _hs_turnover is not None:
         turnover_msg = ''.join([_hs_turnover[0], ' 沪深成交额: ', _hs_turnover[1]])
         update_file.update_hs_turnover("README.md", turnover_msg)
 
-    if not _matched_etf:
+    if _matched_etf is not None:
         etf_msg = ''.join([' '.join([str(etf_dict['code']), str(etf_dict['name']), str(etf_dict['cur_rsi']), '\n'])
                            for etf_dict in _matched_etf])
 
@@ -70,6 +70,9 @@ def merge_and_notify(_start_time, _hs_turnover, _matched_etf):
 IMG_PATH = 'static/'
 
 if __name__ == '__main__':
+    hs_turnover = None
+    matched_etf = None
+
     start_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
     try:
         hs_turnover = find_hs_k_data()

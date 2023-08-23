@@ -66,10 +66,9 @@ def rsi_list(_code):
 
     end_time = datetime.datetime.now().strftime('%Y%m%d')
     beg_time = previous_work_day(end_time, 600).strftime('%Y%m%d')
-    day_k_df = get_quote_history_single(code=_code, beg=beg_time, end=end_time)
-
-    day_close_k = day_k_df.iloc[:, 4]
     try:
+        day_k_df = get_quote_history_single(code=_code, beg=beg_time, end=end_time)
+        day_close_k = day_k_df.iloc[:, 4]
         if len(day_close_k) < 2:
             return _rsi
         elif len(day_close_k) > 255:
@@ -77,7 +76,7 @@ def rsi_list(_code):
         else:
             _rsi = Rsi.smooth_rsi(day_close_k, 28, True)
     except Exception as e:
-        print("exception", _code)
+        print("exception", _code, e)
         pass
         return _rsi
     return _rsi
