@@ -27,3 +27,11 @@
         <img src="https://raw.githubusercontent.com/tf2jaguar/script_tools/main/static/etf_rsi_cost_time.png" width="400" alt="匹配etf执行耗时" />
     </p>
 </div>
+
+
+## 每日通知
+
+以上数据每天会以消息形式推送微信，如有需要，
+添加公众号：NaNa娜娜，并在后台回复添加：etf推送
+
+如有更好想法也可通过公众号沟通。
