@@ -28,28 +28,27 @@ def find_match_etf(_start_time, _below_rsi=31, _record_cost_time=True):
     return match_etf_list
 
 
-def find_hs_k_data():
-    date_str = ''
-    all_turnover = 0.0
+def find_hs_turnover():
+    df = common.get_latest_quote(['上证指数', '深证成指'])
+    all_turnover = df['turnover'].sum()
+    return [df.iloc[-1]['update_time'], num.science_num(all_turnover, 2)]
+
+
+def draw_hs_k_data():
     end_time = datetime.datetime.now().strftime('%Y%m%d')
     beg_time = previous_work_day(end_time, 200).strftime('%Y%m%d')
 
     h_df = common.get_quote_history_single(code='上证指数', beg=beg_time, end=end_time)
     if not h_df.empty:
         h_last_one = h_df.iloc[-1]
-        date_str = h_last_one['date']
-        all_turnover = h_last_one['turnover']
         draw_k_img.draw_k_img(_df=h_df, _save_path=IMG_PATH + h_last_one['code'] + '.png', _render_len=125)
+        print('draw h k line img done.')
 
     s_df = common.get_quote_history_single(code='399001', beg=beg_time, end=end_time)
     if not s_df.empty:
         s_last_one = s_df.iloc[-1]
-        date_str = s_last_one['date']
-        all_turnover = all_turnover + s_last_one['turnover']
         draw_k_img.draw_k_img(_df=s_df, _save_path=IMG_PATH + s_last_one['code'] + '.png', _render_len=125)
-
-    print('draw hs k line img done.')
-    return [date_str, num.science_num(all_turnover, 2)]
+        print('draw s k line img done.')
 
 
 def merge_and_notify(_start_time, _hs_turnover, _matched_etf):
@@ -75,9 +74,14 @@ if __name__ == '__main__':
 
     start_time_str = datetime.datetime.now().strftime('%Y-%m-%d %H:%M')
     try:
-        hs_turnover = find_hs_k_data()
+        draw_hs_k_data()
     except Exception as e:
-        print('find_hs_k_data has error!', e)
+        print('draw_hs_k_data has error!', e)
+
+    try:
+        hs_turnover = find_hs_turnover()
+    except Exception as e:
+        print('find_hs_turnover has error!', e)
 
     try:
         matched_etf = find_match_etf(start_time_str)

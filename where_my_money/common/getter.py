@@ -1,12 +1,13 @@
 #!/usr/bin/env python3
 # _*_ coding:utf-8 _*_
-from typing import List
+from datetime import datetime
+from typing import List, Union
 
 import pandas as pd
 from jsonpath import jsonpath
 from retry import retry
 
-from .config import EASTMONEY_KLINE_FIELDS, EASTMONEY_REQUEST_HEADERS
+from .config import EASTMONEY_KLINE_FIELDS, EASTMONEY_REQUEST_HEADERS, EASTMONEY_QUOTE_FIELDS
 from ..shared import session, rpc
 from ..util import QUOTE_ID_MODE, get_quote_id, to_numeric
 
@@ -51,4 +52,39 @@ def get_quote_history_single(code: str,
     df.insert(0, 'code', code)
     df.insert(0, 'name', name)
 
+    return df
+
+
+@to_numeric
+def get_latest_quote(stock_codes: Union[str, List[str]],
+                     **kwargs) -> pd.DataFrame:
+    if isinstance(stock_codes, str):
+        stock_codes = [stock_codes]
+
+    quote_id_list = [get_quote_id(stock_code) for stock_code in stock_codes]
+    secids: List[str] = quote_id_list
+
+    columns = {**EASTMONEY_QUOTE_FIELDS, **kwargs.get('extra_fields', {})}
+    fields = ",".join(columns.keys())
+    params = (
+        ('OSVersion', '14.3'),
+        ('appVersion', '6.3.8'),
+        ('fields', fields),
+        ('fltt', '2'),
+        ('plat', 'Iphone'),
+        ('product', 'EFund'),
+        ('secids', ",".join(secids)),
+        ('serverVersion', '6.3.6'),
+        ('version', '6.3.8'),
+    )
+
+    json_response = session.get(rpc.API_ULIST_GET, headers=EASTMONEY_REQUEST_HEADERS, params=params).json()
+    rows = jsonpath(json_response, '$..diff[:]')
+    if not rows:
+        df = pd.DataFrame(columns=columns.values())
+    else:
+        df = pd.DataFrame(rows)[list(columns.keys())].rename(columns=columns)
+
+    df['update_time'] = df['update_time'].apply(lambda x: str(datetime.fromtimestamp(x)))
+    df['last_deal_day'] = pd.to_datetime(df['last_deal_day'], format='%Y%m%d').astype(str)
     return df
