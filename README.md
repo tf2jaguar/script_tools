@@ -8,7 +8,7 @@
 </div>
 
 <!-- github_hs_turnover starts -->
-## 2023-11-30 15:10:48 沪深成交额: 7734.87 亿
+## 2023-12-01 14:33:21 沪深成交额: 7375.25 亿
 <!-- github_hs_turnover ends -->
 
 <div align="center">  
