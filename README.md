@@ -8,7 +8,7 @@
 </div>
 
 <!-- github_hs_turnover starts -->
-## 2024-03-29 15:14:12 沪深成交额: 8585.94 亿
+## 2024-04-01 14:32:09 沪深成交额: 8853.45 亿
 <!-- github_hs_turnover ends -->
 
 <div align="center">  
