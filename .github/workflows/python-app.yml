@@ -1,11 +1,11 @@
 name: 'Python Action'
 
 on:
-  push:
-    branches: [ main ]
+#  push:
+#    branches: [ main ]
   schedule:
-    - cron: '20 6 * * 1,2,3,4,5'
-    - cron: '1 7 * * 1,2,3,4,5'
+#    - cron: '20 6 * * 1,2,3,4,5'
+#    - cron: '1 7 * * 1,2,3,4,5'
 
 env:
   TZ: Asia/Shanghai
